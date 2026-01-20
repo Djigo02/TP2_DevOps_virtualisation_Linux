@@ -18,7 +18,23 @@ Vagrant.configure("2") do |config|
     end
 
     srv.vm.provision "shell", inline: <<-SHELL
-      apt update -y
+      apt-get update -y
+
+      # Java 17
+      apt-get install -y openjdk-17-jdk
+
+      java -version
+
+      # Tomcat 9
+      apt-get install -y tomcat9 tomcat9-admin
+
+      systemctl enable tomcat9
+      systemctl start tomcat9
+
+      # Permissions correctes
+      chown -R tomcat:tomcat /var/lib/tomcat9
+
+      echo "Provisioning terminé"
     SHELL
   end
 

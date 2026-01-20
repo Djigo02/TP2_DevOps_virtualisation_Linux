@@ -53,6 +53,38 @@ Lancer les tests
     - Sauvegarder et redémarrer le service mysql
       `sudo systemctl restart mysql`
 
+  - Installer postgresql
+    `sudo apt install postgresql postgresql-contrib -y`
+    `sudo systemctl start postgresql`
+    `sudo systemctl status postgresql`
+
+  - Se connecter à postgresql
+    `sudo -i -u postgres`
+    `psql`
+
+  - Créer la base de données et l'utilisateur
+
+  ```sql
+    CREATE DATABASE appdb;
+    CREATE USER appuser WITH PASSWORD 'app123';
+    GRANT ALL PRIVILEGES ON DATABASE appdb TO appuser;
+    ALTER DATABASE appdb OWNER TO appuser;
+  \q
+  ```
+
+  - Modifier le fichier pg_hba.conf pour autoriser les connexions distantes
+    `sudo vi /etc/postgresql/*/main/postgresql.conf`
+    - Modifier `listen_addresses = '*'`
+
+    `sudo vi /etc/postgresql/*/main/pg_hba.conf`
+    - Ajouter la ligne suivante à la fin du fichier
+      `host    appdb    appuser    192.168.0.0/24    md5`
+
+    - Redémarrer postgresql
+      `sudo systemctl restart postgresql`
+
+---
+
 - Pour la vm srv-app
 - Installer jdk 8, 11, 17
   `sudo apt install openjdk-8-jdk openjdk-11-jdk openjdk-17-jdk -y`
@@ -80,7 +112,7 @@ Lancer les tests
   ![Test tomcat](image-2.png)
 - Déployer l'application web
   - Copier le fichier war dans le répertoire webapps de tomcat
-    `vagrant upload app/examen-0.0.1.war /home/vagrant/`
+    `vagrant upload app/examen-0.0.1.war /home/vagrant/ srv-app`
 
     ```bash
         sudo mv /home/vagrant/examen-0.0.1.war /var/lib/tomcat9/webapps/
@@ -89,6 +121,10 @@ Lancer les tests
 
   - Redémarrer tomcat
     `sudo systemctl restart tomcat9`
+
+    ![Page d'accueil](image-3.png)
+    ![Page sectors](image-4.png)
+    ![Page classes](image-5.png)
 
 - Tester la connexion à la base de données via l'application web
   ```bash
